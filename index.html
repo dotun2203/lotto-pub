@@ -74,6 +74,8 @@
       //     // do nothing or whatever you want
       //   });
 
+      const tg = window.Telegram.WebApp;
+
       const adbutton = document.getElementById("ad-button");
       const rewardMessage = document.getElementById("reward-message");
       const adContainer = document.getElementById("ad-container");
@@ -82,9 +84,32 @@
         adbutton.disabled = true;
         adbutton.innerText = "watching ad ...";
 
+        const user_id = tg.initDataUnsafe.user.id;
+
         setTimeout(() => {
           adbutton.style.display = "none";
           rewardMessage.style.display = "block";
+
+          fetch("https://adgramtemplate.vercel.app/adsgram_callback", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              user_id: user_id,
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.status === "success") {
+                alert("token credited successfully! you can play now");
+                window.Telegram.WebApp.close();
+              } else {
+                console.error("Error:", error);
+                alert("Error occurred while crediting token.");
+              }
+            });
+
           console.log("User ha watched the ad and earned a token");
         }, 5000);
       });
