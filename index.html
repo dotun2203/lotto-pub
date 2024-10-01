@@ -112,6 +112,10 @@
                     console.error("Error:", error);
                     alert("Error occurred while crediting token.");
                   }
+                })
+                .catch((error) => {
+                  console.error("Error:", error);
+                  alert("error occured while communicaton with the server");
                 });
             } else {
               console.error("User ID not available.");
@@ -124,9 +128,9 @@
           }, 5000);
         });
       } else {
-        console.error("User ID not available.");
+        console.error("Telegram webapp is not available.");
         alert(
-          "User information is not available. Make sure you are running this in Telegram."
+          "Telegram WebApp is not available. Make sure you are running this inside Telegram."
         );
       }
     </script>
