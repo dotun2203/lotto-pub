@@ -94,15 +94,18 @@
 
             if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
               const user_id = tg.initDataUnsafe.user.id;
-              fetch("http://127.0.0.1:5000/adsgram_callback", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  user_id: user_id,
-                }),
-              })
+              fetch(
+                " https://bfb4-102-88-35-123.ngrok-free.app/adsgram_callback",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    user_id: user_id,
+                  }),
+                }
+              )
                 .then((response) => response.json())
                 .then((data) => {
                   if (data.status === "success") {
