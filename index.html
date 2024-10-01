@@ -94,7 +94,7 @@
 
             if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
               const user_id = tg.initDataUnsafe.user.id;
-              fetch("https://adgramtemplate.vercel.app/adsgram_callback", {
+              fetch("http://127.0.0.1:5000/adsgram_callback/", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
