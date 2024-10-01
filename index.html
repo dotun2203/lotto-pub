@@ -4,54 +4,89 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <script src="https://adsgram.io/sdk.js"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 50px;
+        background-color: #f4f4f4;
+      }
+
+      #ad-container {
+        width: 300px;
+        height: 250px;
+        margin: 20px auto;
+        background-color: #ddd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #333;
+        position: relative;
+      }
+
+      #ad-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      #ad-button {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 10px 20px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        border-radius: 5px;
+      }
+
+      #reward-message {
+        display: none;
+        margin-top: 20px;
+        font-size: 18px;
+        color: #28a745;
+      }
+    </style>
+
+    <!-- <script src="https://sad.adsgram.ai/js/sad.min.js"></script> -->
   </head>
   <body>
     <h1>Watch an Ad to earn Tokens to play</h1>
-    <div id="ad-container"></div>
+    <div id="ad-container">
+      <button id="ad-button">Watch ad</button>
+    </div>
+
+    <p id="reward-message">Thank you! You have earned a token.</p>
+
     <script>
-      // Initialize Telegram Web App
-      const tg = window.Telegram.WebApp;
+      // const AdController = window.Adsgram.init({ blockId: "3702" });
+      // AdController.show()
+      //   .then((result) => {
+      //     // user watch ad till the end
+      //     // your code to reward user
+      //   })
+      //   .catch((result) => {
+      //     // user get error during playing ad or skip ad
+      //     // do nothing or whatever you want
+      //   });
 
-      // Initialize AdsGram
-      AdsGram.init({
-        appId: "9292", // Replace with your AdsGram App ID
-        userId: tg.initDataUnsafe.user.id,
-        // Other initialization parameters as required by AdsGram
-      });
+      const adbutton = document.getElementById("ad-button");
+      const rewardMessage = document.getElementById("reward-message");
+      const adContainer = document.getElementById("ad-container");
 
-      // Display the ad
-      AdsGram.showAd("ad-container", {
-        onComplete: function () {
-          // Ad was viewed completely
-          // Notify your server to credit the user
-          fetch("https://yourdomain.com/adsgram_callback", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              user_id: tg.initDataUnsafe.user.id,
-            }),
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.status === "success") {
-                alert("Thank you! Your token has been credited.");
-                tg.close(); // Close the Web App
-              } else {
-                alert("Error crediting token.");
-              }
-            })
-            .catch((error) => {
-              console.error("Error:", error);
-              alert("An error occurred while crediting your token.");
-            });
-        },
-        onError: function (error) {
-          alert("An error occurred while displaying the ad.");
-        },
+      adbutton.addEventListener("click", function () {
+        adbutton.disabled = true;
+        adbutton.innerText = "watching ad ...";
+
+        setTimeout(() => {
+          adbutton.style.display = "none";
+          rewardMessage.style.display = "block";
+          console.log("User ha watched the ad and earned a token");
+        }, 5000);
       });
     </script>
   </body>
