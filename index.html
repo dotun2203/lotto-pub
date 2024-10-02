@@ -76,15 +76,18 @@
               const user_id = tg.initDataUnsafe.user.id;
 
               // Fetch request to send user ID to backend and update token
-              fetch("http://127.0.0.1:4040/adsgram_callback", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  user_id: user_id,
-                }),
-              })
+              fetch(
+                "https://9c47-102-89-43-26.ngrok-free.app/adsgram_callback",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    user_id: user_id,
+                  }),
+                }
+              )
                 .then((response) => {
                   if (!response.ok) {
                     throw new Error("Network response was not ok");
