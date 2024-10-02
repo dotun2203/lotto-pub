@@ -76,18 +76,15 @@
               const user_id = tg.initDataUnsafe.user.id;
 
               // Fetch request to send user ID to backend and update token
-              fetch(
-                "https://bfb4-102-88-35-123.ngrok-free.app/adsgram_callback",
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    user_id: user_id,
-                  }),
-                }
-              )
+              fetch("http://127.0.0.1:4040/adsgram_callback", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  user_id: user_id,
+                }),
+              })
                 .then((response) => {
                   if (!response.ok) {
                     throw new Error("Network response was not ok");
@@ -96,11 +93,12 @@
                 })
                 .then((data) => {
                   if (data.status === "success") {
+                    rewardMessage.style.display = "block";
                     alert("Token credited successfully! You can play now.");
                     window.Telegram.WebApp.close();
                   } else {
                     console.error("Server error:", data.message);
-                    alert("Error occurred while crediting token.");
+                    alert("Error occurred while crediting token");
                   }
                 })
                 .catch((error) => {
@@ -110,7 +108,7 @@
             } else {
               console.error("User ID not available.");
               alert(
-                "User information is not available. Make sure you are running this in Telegram."
+                "User information is not available. Make sure you are running this in Telegram"
               );
             }
           }, 5000);
