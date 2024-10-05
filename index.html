@@ -58,7 +58,7 @@
     <script>
       // Check if Telegram WebApp is available
       if (window.Telegram && window.Telegram.WebApp) {
-        const tg = window.Telegram.WebApp;
+        const tg = window.Telegram.web_app;
 
         const adButton = document.getElementById("ad-button");
         const rewardMessage = document.getElementById("reward-message");
@@ -74,7 +74,7 @@
 
             if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
               const user_id = tg.initDataUnsafe.user.id;
-
+              // const user_id = "1234";
               // Fetch request to send user ID to backend and update token
               fetch(
                 "https://9c47-102-89-43-26.ngrok-free.app/adsgram_callback",
@@ -98,7 +98,7 @@
                   if (data.status === "success") {
                     rewardMessage.style.display = "block";
                     alert("Token credited successfully! You can play now.");
-                    window.Telegram.WebApp.close();
+                    web_app_close();
                   } else {
                     console.error("Server error:", data.message);
                     alert("Error occurred while crediting token");
@@ -114,7 +114,7 @@
                 "User information is not available. Make sure you are running this in Telegram"
               );
             }
-          }, 15000);
+          }, 3000);
         });
       } else {
         console.error("Telegram WebApp is not available.");
