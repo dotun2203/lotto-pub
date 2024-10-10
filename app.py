@@ -680,13 +680,29 @@ async def delete_option(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await query.message.reply_text("Option not found.")
 
+
+async def set_webhook(application):
+    webhook_url = os.getenv('WEBHOOK_URL', 'https://telegram-lotto-bot.onrender.com')
+
+    await application.bot.set_webhook(webhook_url)
+
+
+@app.route('/render-webhook', methods=['POST'])
+def webhook_handler():
+    update = Update.de_json(request.get_json(force=True), application.bot)
+    asyncio.run(application.process_update(update))
+    return 'ok'
+
 async def post_init(application):
     await set_bot_commands(application)
 
 def main():
+    global application
     with app.app_context():
         init_db()
     application = (ApplicationBuilder().token(TOKEN).connect_timeout(60).read_timeout(60).post_init(post_init).build())
+
+    asyncio.get_event_loop().run_until_complete(set_webhook(application))
 
     # await set_bot_commands(application)
     # start
@@ -727,7 +743,8 @@ def main():
 
 
 
-    application.run_polling()
+    # application.run_polling()
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
     # application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, capture_category_name_for_option))
 
 
