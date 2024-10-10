@@ -37,8 +37,7 @@ db.init_app(app)
 # db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-CORS(app, resources={r"/render-webhook":{"origins" : "*"}})
-
+CORS(app, resources={r"/render-webhook": {"origins": "*"}})
 ADMIN_IDS = [6687026573]
 
 
@@ -755,9 +754,9 @@ def main():
 
     if env == 'production':
         logging.info("Running in production mode, setting webhook")
-        loop = asyncio.new_event_loop
+        loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        loop.create_task(set_webhook(application))
+        loop.run_until_complete(set_webhook(application))
         # asyncio.run(set_webhook(application))
         # Serve the Flask app
         logging.info("Serving Flask app")
