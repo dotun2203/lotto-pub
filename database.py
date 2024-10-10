@@ -48,5 +48,5 @@ class GameOption(db.Model):
     category = db.relationship('GameCategory', backref=db.backref('options',lazy=True))
 
 def init_db():
-    db.drop_all()
+    # db.drop_all()
     db.create_all()
