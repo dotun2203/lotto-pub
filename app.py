@@ -12,11 +12,14 @@ from database import GameCategory, GameOption, Video, db, User, GameHistory, ini
 from telegram.ext import ContextTypes
 from flask_cors import CORS
 import os
+from asgiref.wsgi import WsgiToAsgi
 
 
 
 logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
+
+asgi_app = WsgiToAsgi(app)
 
 
 env = os.getenv('FLASK_ENV', 'development')

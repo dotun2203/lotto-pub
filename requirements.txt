@@ -34,3 +34,4 @@ Werkzeug
 psycopg2
 gunicorn
 uvicorn
+asgiref
