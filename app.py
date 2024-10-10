@@ -755,8 +755,12 @@ def main():
 
     if env == 'production':
         logging.info("Running in production mode, setting webhook")
-        asyncio.run(set_webhook(application))
+        loop = asyncio.new_event_loop
+        asyncio.set_event_loop(loop)
+        loop.create_task(set_webhook(application))
+        # asyncio.run(set_webhook(application))
         # Serve the Flask app
+        logging.info("Serving Flask app")
         app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
     else:
          # In development, use polling
