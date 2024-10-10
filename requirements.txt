@@ -33,3 +33,4 @@ tzdata
 Werkzeug
 psycopg2
 gunicorn
+aiohttp
