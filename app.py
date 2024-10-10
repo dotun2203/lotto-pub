@@ -5,6 +5,7 @@ from flask import Flask, jsonify, request
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from telegram import BotCommand, Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
+import telegram
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, MessageHandler, filters
 from config import DevelopmentConfig, ProductionConfig
 from database import GameCategory, GameOption, Video, db, User, GameHistory, init_db, migrate
@@ -19,6 +20,7 @@ app = Flask(__name__)
 
 
 env = os.getenv('FLASK_ENV', 'development')
+TOKEN="8064622273:AAHi_B_PQQMcjRbJr3jmmZJ7dO-9MXrL0PI"
 
 if env == 'production':
     app.config.from_object(ProductionConfig)
@@ -35,7 +37,6 @@ migrate = Migrate(app, db)
 CORS(app, resources={r"/adsgram_callback":{"origins" : "*"}})
 
 ADMIN_IDS = [6687026573]
-TOKEN="8064622273:AAHi_B_PQQMcjRbJr3jmmZJ7dO-9MXrL0PI"
 
 
 
@@ -91,7 +92,7 @@ async def handle_text(update:Update, context:ContextTypes.DEFAULT_TYPE):
         logging.info("No active state. Ignoring message")
 
 async def get_user_id(update:Update, context:ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.i
+    user_id = update.effective_user.id
     await update.message.reply_text(f"your teelgram user id is: {user_id}")
 
 async def start(update: Update, context:ContextTypes.DEFAULT_TYPE):
@@ -99,12 +100,16 @@ async def start(update: Update, context:ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     user_name = update.effective_user.first_name
 
-    with app.app_context():
-        user = User.query.filter_by(telegram_id=user_id).first()
-        if not user:
-            new_user = User(telegram_id=user_id, name=user_name)
-            db.session.add(new_user)
-            db.session.commit()
+    try:
+        with app.app_context():
+            user = User.query.filter_by(telegram_id=user_id).first()
+            if not user:
+                new_user = User(telegram_id=user_id, name=user_name)
+                db.session.add(new_user)
+                db.session.commit()
+    except Exception as e:
+        logging.error(f"Database error: {e}")
+        await update.message.reply_text("Error interacting with the database")
         
         # video_link = user.video_link if user.video_link else None
         # video_name = user.video_name if user.video_name else None
@@ -684,14 +689,28 @@ async def delete_option(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def set_webhook(application):
     webhook_url = os.getenv('WEBHOOK_URL', 'https://telegram-lotto-bot.onrender.com')
 
-    await application.bot.set_webhook(webhook_url)
+    try:
+        await application.bot.set_webhook(webhook_url)
+        logging.info(f"Webhook set successfully to {webhook_url}")
+    except telegram.error.TimedOut as e:
+        logging.error(f"Error setting webhook: {e}")
 
 
 @app.route('/render-webhook', methods=['POST'])
 def webhook_handler():
-    update = Update.de_json(request.get_json(force=True), application.bot)
-    asyncio.run(application.process_update(update))
+    json_data = request.get_json(force=True)
+    update = Update.de_json(json_data, application.bot)
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(application.process_update(update))
+
+    # asyncio.run(application.process_update(update))
     return 'ok'
+
+@app.route('/')
+def index():
+    return "bot is running"
 
 async def post_init(application):
     await set_bot_commands(application)
@@ -702,7 +721,21 @@ def main():
         init_db()
     application = (ApplicationBuilder().token(TOKEN).connect_timeout(60).read_timeout(60).post_init(post_init).build())
 
-    asyncio.get_event_loop().run_until_complete(set_webhook(application))
+    if env == 'production':
+        logging.info("Running in production mode, setting webhook")
+        asyncio.run(set_webhook(application))
+        # Serve the Flask app
+        app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    else:
+         # In development, use polling
+        logging.info("Running in development mode, using polling")
+        application.run_polling()
+
+    
+
+    # asyncio.get_event_loop().run_until_complete(set_webhook(application))
+
+    # asyncio.run(set_webhook(application))
 
     # await set_bot_commands(application)
     # start
@@ -741,12 +774,17 @@ def main():
 
     # application.add_handler(CommandHandler("history", view_history))
 
-
+    # loop = asyncio.new_event_loop()
+    # asyncio.set_event_loop(loop)
+    # loop.run_until_complete(set_webhook(application))
 
     # application.run_polling()
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
+    # application.run_polling()
+    # app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
     # application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, capture_category_name_for_option))
 
 
 if __name__ == '__main__':
     main()
+    # application.run_polling()
