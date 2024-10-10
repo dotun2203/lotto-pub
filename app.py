@@ -721,24 +721,6 @@ def main():
         init_db()
     application = (ApplicationBuilder().token(TOKEN).connect_timeout(60).read_timeout(60).post_init(post_init).build())
 
-    if env == 'production':
-        logging.info("Running in production mode, setting webhook")
-        asyncio.run(set_webhook(application))
-        # Serve the Flask app
-        app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-    else:
-         # In development, use polling
-        logging.info("Running in development mode, using polling")
-        application.run_polling()
-
-    
-
-    # asyncio.get_event_loop().run_until_complete(set_webhook(application))
-
-    # asyncio.run(set_webhook(application))
-
-    # await set_bot_commands(application)
-    # start
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CallbackQueryHandler(list_categories_and_options, pattern="list_categories_and_options"))
     # application.add_handler(CommandHandler("get_user_id", get_user_id))
@@ -766,6 +748,26 @@ def main():
 
     # application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, capture_options))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
+
+    if env == 'production':
+        logging.info("Running in production mode, setting webhook")
+        asyncio.run(set_webhook(application))
+        # Serve the Flask app
+        app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    else:
+         # In development, use polling
+        logging.info("Running in development mode, using polling")
+        application.run_polling()
+
+    
+
+    # asyncio.get_event_loop().run_until_complete(set_webhook(application))
+
+    # asyncio.run(set_webhook(application))
+
+    # await set_bot_commands(application)
+    # start
+
     # adding options
 
   
