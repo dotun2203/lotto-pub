@@ -37,7 +37,7 @@ db.init_app(app)
 # db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-CORS(app, resources={r"/adsgram_callback":{"origins" : "*"}})
+CORS(app, resources={r"/render-webhook":{"origins" : "*"}})
 
 ADMIN_IDS = [6687026573]
 
@@ -702,6 +702,7 @@ async def set_webhook(application):
 @app.route('/render-webhook', methods=['POST'])
 def webhook_handler():
     json_data = request.get_json(force=True)
+    logging.info(f"Received webhook: {json_data}")
     update = Update.de_json(json_data, application.bot)
 
     loop = asyncio.new_event_loop()
